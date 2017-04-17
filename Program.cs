@@ -1,11 +1,11 @@
-﻿using GitVersion;
-using GitVersion.Helpers;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using GitVersion;
+using GitVersion.Helpers;
+using Newtonsoft.Json.Linq;
 
 namespace dotnet.gitversion
 {
@@ -65,16 +65,25 @@ namespace dotnet.gitversion
             {
                 var match = s_regex.Match(file.Name);
 
-                if (match.Success)
+                if (!match.Success)
+                {
+                    continue;
+                }
+
+                if (match.Groups["json"].Success)
                 {
                     found = true;
+                    options.ProjectJson = file.FullName;
+                }
+                else if (match.Groups["csproj"].Success)
+                {
+                    var document = XDocument.Load(file.FullName);
+                    var sdkAttribute = document.Root.DescendantsAndSelf("Project")?.FirstOrDefault()?.Attribute("Sdk");
+                    var isNetCoreProject = string.Equals("Microsoft.NET.Sdk", sdkAttribute?.Value, StringComparison.OrdinalIgnoreCase);
 
-                    if (match.Groups["json"].Success)
+                    if (isNetCoreProject)
                     {
-                        options.ProjectJson = file.FullName;
-                    }
-                    else if (match.Groups["csproj"].Success)
-                    {
+                        found = true;
                         options.CsProj = file.FullName;
                     }
                 }
@@ -101,7 +110,7 @@ namespace dotnet.gitversion
             var document = XDocument.Load(csproj);
             var packageVersion = XName.Get("PackageVersion");
             var isSet = false;
-            var descendents = document.Root.Descendants().ToArray();
+
             foreach (var node in document.Root.Descendants(packageVersion))
             {
                 node.Value = legacySemVerPadded;
