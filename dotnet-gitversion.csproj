@@ -7,15 +7,13 @@
     <OutputType>Exe</OutputType>
     <PackageId>dotnet-gitversion</PackageId>
     <PackageTargetFallback>$(PackageTargetFallback);dotnet</PackageTargetFallback>
-    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="GitVersionCore-dotnet" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <PackageReference Include="System.Diagnostics.TraceSource" Version="4.0.0" />
   </ItemGroup>
 
